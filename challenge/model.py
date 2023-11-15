@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
+
 from sklearn.linear_model import LogisticRegression
+from sklearn.utils.validation import check_is_fitted
+from sklearn.exceptions import NotFittedError
 
 from .pre_preprocess_aux import get_min_diff
 
@@ -87,4 +90,14 @@ class DelayModel:
         Returns:
             (List[int]): predicted targets.
         """
-        return
+        try:
+            check_is_fitted(self._model)
+        except NotFittedError as e:
+            raise NotFittedError(
+                "This DelayModel instance is not fitted yet. Call 'fit' with "
+                "appropriate arguments before using this estimator."
+            )
+
+        predicted_target = self._model.predict(features)
+
+        return predicted_target.tolist()
