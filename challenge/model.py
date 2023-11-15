@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import LogisticRegression
 
 from .pre_preprocess_aux import get_min_diff
 
@@ -8,7 +9,7 @@ from typing import Tuple, Union, List
 
 class DelayModel:
     def __init__(self):
-        self._model = None  # Model should be saved in this attribute.
+        self._model = LogisticRegression()  # Model should be saved in this attribute.
         self.top_10_features = top_10_features = [
             "OPERA_Latin American Wings",
             "MES_7",
@@ -69,7 +70,12 @@ class DelayModel:
             features (pd.DataFrame): preprocessed data.
             target (pd.DataFrame): target.
         """
-        return
+        n_y0 = len(target[target.iloc[:, 0] == 0])
+        n_y1 = len(target[target.iloc[:, 0] == 1])
+        class_weight = {1: n_y0 / len(target), 0: n_y1 / len(target)}
+
+        self._model.class_weight = class_weight
+        self._model.fit(features, target.values.ravel())
 
     def predict(self, features: pd.DataFrame) -> List[int]:
         """
