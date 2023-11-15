@@ -1,1 +1,4 @@
 env/
+.coverage
+reports/
+**/__pycache__/
