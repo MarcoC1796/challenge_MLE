@@ -30,6 +30,7 @@ async def get_health() -> dict:
     return {"status": "OK"}
 
 
+# Adding a comment to check ci.workflow
 @app.post("/predict", status_code=200)
 async def post_predict(flight_list: FlightList) -> dict:
     try:
