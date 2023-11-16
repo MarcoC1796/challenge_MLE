@@ -1,5 +1,4 @@
 env/
 .venv/
 .coverage
-reports/
 **/__pycache__/
