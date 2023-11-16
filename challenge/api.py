@@ -32,7 +32,7 @@ async def get_health() -> dict:
 
 @app.post("/predict", status_code=200)
 async def post_predict(flight_list: FlightList) -> dict:
-     try:
+    try:
         data = pd.DataFrame([flight.dict() for flight in flight_list.flights])
 
         logging.debug(f"Incoming prediction request with data: {data}")
