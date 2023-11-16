@@ -70,9 +70,7 @@ class TestModel(unittest.TestCase):
         assert report["1"]["f1-score"] > 0.30
 
     def test_model_predict(self):
-        features, target = self.model.preprocess(data=self.data, target_column="delay")
-
-        self.model.fit(features=features, target=target)
+        features = self.model.preprocess(data=self.data)
 
         predicted_targets = self.model.predict(features)
 

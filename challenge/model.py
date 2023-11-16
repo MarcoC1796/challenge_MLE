@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import joblib
+import os
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.utils.validation import check_is_fitted
@@ -11,8 +13,9 @@ from typing import Tuple, Union, List
 
 
 class DelayModel:
-    def __init__(self):
+    def __init__(self, model_filename="model.joblib"):
         self._model = LogisticRegression()  # Model should be saved in this attribute.
+        self.model_file_path = os.path.join(os.path.dirname(__file__), model_filename)
         self.top_10_features = top_10_features = [
             "OPERA_Latin American Wings",
             "MES_7",
@@ -25,6 +28,7 @@ class DelayModel:
             "OPERA_Sky Airline",
             "OPERA_Copa Air",
         ]
+        self.load_model()
 
     def preprocess(
         self, data: pd.DataFrame, target_column: str = None
@@ -79,6 +83,7 @@ class DelayModel:
 
         self._model.class_weight = class_weight
         self._model.fit(features, target.values.ravel())
+        joblib.dump(self._model, self.model_file_path)
 
     def predict(self, features: pd.DataFrame) -> List[int]:
         """
@@ -101,3 +106,8 @@ class DelayModel:
         predicted_target = self._model.predict(features)
 
         return predicted_target.tolist()
+
+    def load_model(self):
+        """Loads the model from the file if it exists."""
+        if os.path.exists(self.model_file_path):
+            self._model = joblib.load(self.model_file_path)
