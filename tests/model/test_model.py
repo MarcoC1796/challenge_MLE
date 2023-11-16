@@ -29,7 +29,27 @@ class TestModel(unittest.TestCase):
         data_file_path = os.path.join(
             os.path.dirname(__file__), "..", "..", "data", "data.csv"
         )
-        self.data = pd.read_csv(filepath_or_buffer=data_file_path)
+        data_types = {
+            "Fecha-I": str,  # Scheduled date and time of the flight.
+            "Vlo-I": str,  # Scheduled flight number.
+            "Ori-I": str,  # Programmed origin city code.
+            "Des-I": str,  # Programmed destination city code.
+            "Emp-I": str,  # Scheduled flight airline code.
+            "Fecha-O": str,  # Date and time of flight operation.
+            "Vlo-O": str,  # Flight operation number of the flight.
+            "Ori-O": str,  # Operation origin city code.
+            "Des-O": str,  # Operation destination city code.
+            "Emp-O": str,  # Airline code of the operated flight.
+            "DIA": int,  # Day of the month of flight operation.
+            "MES": int,  # Number of the month of operation of the flight.
+            "AÑO": int,  # Year of flight operation.
+            "DIANOM": str,  # Day of the week of flight operation.
+            "TIPOVUELO": str,  # Type of flight, I = International, N = National.
+            "OPERA": str,  # Name of the airline that operates.
+            "SIGLAORI": str,  # Name city of origin.
+            "SIGLADES": str,  # Destination city name.
+        }
+        self.data = pd.read_csv(filepath_or_buffer=data_file_path, dtype=data_types)
 
     def test_model_preprocess_for_training(self):
         features, target = self.model.preprocess(data=self.data, target_column="delay")
