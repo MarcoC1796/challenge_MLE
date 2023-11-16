@@ -37,6 +37,20 @@ async def post_predict(flight_list: FlightList) -> dict:
 
         logging.debug(f"Incoming prediction request with data: {data}")
 
+        known_categories = delay_model.category_mapping
+        for column in ["OPERA", "TIPOVUELO", "MES"]:
+            if any(
+                item not in known_categories[column] for item in data[column].unique()
+            ):
+                unknown_categories = set(data[column].unique()) - set(
+                    known_categories[column]
+                )
+                error_message = (
+                    f"Unknown categories in column {column}: {unknown_categories}"
+                )
+                logging.error(error_message)
+                raise fastapi.HTTPException(status_code=400, detail=error_message)
+
         features = delay_model.preprocess(data)
         predictions = delay_model.predict(features)
 
