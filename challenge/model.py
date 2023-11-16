@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import os
+import json
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.utils.validation import check_is_fitted
@@ -28,7 +29,9 @@ class DelayModel:
             "OPERA_Sky Airline",
             "OPERA_Copa Air",
         ]
+        self.category_mapping = None
         self.load_model()
+        self.load_categories()
 
     def preprocess(
         self, data: pd.DataFrame, target_column: str = None
@@ -45,15 +48,27 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
+        if not hasattr(self, "category_mapping"):
+            self.load_categories()
 
-        features = pd.concat(
-            [
-                pd.get_dummies(data["OPERA"], prefix="OPERA"),
-                pd.get_dummies(data["TIPOVUELO"], prefix="TIPOVUELO"),
-                pd.get_dummies(data["MES"], prefix="MES"),
-            ],
-            axis=1,
+        opera_dummies = pd.get_dummies(data["OPERA"], prefix="OPERA").reindex(
+            columns=["OPERA_" + str(cat) for cat in self.category_mapping["OPERA"]],
+            fill_value=0,
         )
+        tipovuelo_dummies = pd.get_dummies(
+            data["TIPOVUELO"], prefix="TIPOVUELO"
+        ).reindex(
+            columns=[
+                "TIPOVUELO_" + str(cat) for cat in self.category_mapping["TIPOVUELO"]
+            ],
+            fill_value=0,
+        )
+        mes_dummies = pd.get_dummies(data["MES"], prefix="MES").reindex(
+            columns=["MES_" + str(cat) for cat in self.category_mapping["MES"]],
+            fill_value=0,
+        )
+
+        features = pd.concat([opera_dummies, tipovuelo_dummies, mes_dummies], axis=1)
 
         features = features[self.top_10_features]
 
@@ -111,3 +126,22 @@ class DelayModel:
         """Loads the model from the file if it exists."""
         if os.path.exists(self.model_file_path):
             self._model = joblib.load(self.model_file_path)
+
+    def load_categories(self):
+        """
+        Load category mapping from the 'category_mapping.json' file in the same directory as the script.
+
+        Raises:
+            FileNotFoundError: If the 'category_mapping.json' file is not found.
+        """
+        categories_file_path = os.path.join(
+            os.path.dirname(__file__), "category_mapping.json"
+        )
+
+        if os.path.exists(categories_file_path):
+            with open(categories_file_path, "r") as json_file:
+                self.category_mapping = json.load(json_file)
+        else:
+            raise FileNotFoundError(
+                "Category mapping JSON file not found. Make sure to generate it first."
+            )
