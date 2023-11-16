@@ -16,7 +16,7 @@ class DelayModel:
     def __init__(self, model_filename="model.joblib"):
         self._model = LogisticRegression()  # Model should be saved in this attribute.
         self.model_file_path = os.path.join(os.path.dirname(__file__), model_filename)
-        self.top_10_features = top_10_features = [
+        self.top_10_features = [
             "OPERA_Latin American Wings",
             "MES_7",
             "MES_10",
