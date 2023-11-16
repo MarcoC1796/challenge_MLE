@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+      
+env:
+  PROJECT_ID: challenge-app-ml
+  SERVICE: challenge-app-ml
+  REGION: us-central1
+  DOCKER_HUB_REPOSITORY: marcochacon/challenge-app
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   deploy:
